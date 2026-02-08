@@ -32,17 +32,22 @@ export async function POST(request: Request) {
     // GÖRSEL OPTİMİZASYONU (Sadece resim dosyaları için)
     if (file.type.startsWith('image/')) {
         try {
-            // Resmi sıkıştır ve yeniden boyutlandır
-            buffer = await sharp(buffer)
-                .resize(1600, 1600, { // Maksimum 1600x1600 boyutuna sığdır
-                    fit: 'inside', // Orantıyı bozma
-                    withoutEnlargement: true // Küçük resimleri büyütme
-                })
-                .jpeg({ quality: 80, mozjpeg: true }) // %80 kalite ile JPEG yap
-                .toBuffer();
+            const imagePipeline = sharp(buffer).resize(1600, 1600, {
+                fit: 'inside',
+                withoutEnlargement: true
+            });
 
-            // Uzantıyı .jpg olarak değiştir (Çünkü artık her resim bir jpg)
-            cleanName = cleanName.replace(/\.[^/.]+$/, "") + ".jpg";
+            if (file.type === 'image/png') {
+                buffer = await imagePipeline.png({ quality: 80 }).toBuffer();
+                // Uzantıyı .png oldugundan emin ol
+                if (!cleanName.toLowerCase().endsWith('.png')) {
+                    cleanName = cleanName.replace(/\.[^/.]+$/, "") + ".png";
+                }
+            } else {
+                buffer = await imagePipeline.jpeg({ quality: 80, mozjpeg: true }).toBuffer();
+                // Uzantıyı .jpg olarak değiştir
+                cleanName = cleanName.replace(/\.[^/.]+$/, "") + ".jpg";
+            }
         } catch (error) {
             console.error("Optimizasyon hatası (orijinal dosya kaydedilecek):", error);
         }

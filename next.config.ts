@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
         hostname: '**', // Dış kaynaklı test resimlerine izin vermek için (Gerekirse kısıtlayın)
       },
     ],
-    unoptimized: false, // Next.js Image Optimization servisini kullan
+    unoptimized: true, // Sunucu performansını artırmak için optimizasyonu kapattık
   },
   
   // Deneysel özellikler (gerekirse)

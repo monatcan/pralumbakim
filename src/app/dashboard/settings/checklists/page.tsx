@@ -92,18 +92,27 @@ export default function ChecklistSettingsPage() {
 
     if (editingId) {
         // Update
-        await fetch("/api/settings/checklists", {
+        const res = await fetch("/api/settings/checklists", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ ...payload, id: editingId })
         });
+        if (!res.ok) {
+            alert("Güncelleme başarısız oldu. Lütfen tekrar deneyin.");
+            return;
+        }
     } else {
         // Create
-        await fetch("/api/settings/checklists", {
+        const res = await fetch("/api/settings/checklists", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
+        if (!res.ok) {
+            const error = await res.json();
+            alert(`Oluşturma başarısız: ${error.error || "Bilinmeyen hata"}`);
+            return;
+        }
     }
     
     setIsModalOpen(false);

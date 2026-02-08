@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  PROJECT_MANAGER
+  BRANCH_MANAGER
+  FIELD_STAFF
+}
+
+enum MaintenanceStatus {
+  PENDING
+  IN_PROGRESS
+  PENDING_APPROVAL
+  APPROVED
+  ARCHIVED
+  NEEDS_VISIT
+  INCOMPLETE
+  CANCELLED
+  REJECTED
+}
+
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  logo      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  branches Branch[]
+  users    User[]
+  checklistTemplates ChecklistTemplate[]
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  latitude  Float?
+  longitude Float?
+  qrCode    String   @unique @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+
+  maintenanceLogs MaintenanceLog[]
+  assignedUsers   User[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clients   Client[]
+
+  assignedBranches Branch[]
+
+  maintenanceLogs MaintenanceLog[]
+}
+
+model MaintenanceLog {
+  id        String            @id @default(uuid())
+  date      DateTime          @default(now())
+  status    MaintenanceStatus @default(PENDING)
+  notes     String?
+  instructions String? // Copied from ChecklistTemplate at creation
+  isArchived Boolean          @default(false)
+  completedAt DateTime?       // New: Date when status becomes APPROVED/COMPLETED
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  branchId String
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  staffId String
+  staff   User   @relation(fields: [staffId], references: [id])
+
+  photos          Photo[]
+  checklistItems  ChecklistItem[]
+}
+
+model ChecklistTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  items     Json     @default("[]") // Array of strings e.g. ["Clean", "Check"]
+  instructions String? // Saha personeli için talimatlar/yönergeler
+  isGlobal  Boolean  @default(false)
+  
+  clientId  String?
+  client    Client?  @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  url       String
+  type      String?
+  createdAt DateTime @default(now())
+
+  maintenanceLogId String
+  maintenanceLog   MaintenanceLog @relation(fields: [maintenanceLogId], references: [id])
+}
+
+model ChecklistItem {
+  id        String   @id @default(uuid())
+  question  String
+  isChecked Boolean  @default(false)
+  note      String?
+  
+  maintenanceLogId String
+  maintenanceLog   MaintenanceLog @relation(fields: [maintenanceLogId], references: [id])
+}

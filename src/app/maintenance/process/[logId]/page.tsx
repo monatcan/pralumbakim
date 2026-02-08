@@ -56,7 +56,11 @@ function MaintenanceProcessPageContent() {
       if (res.ok) {
         const data = await res.json();
         setLog(data);
-        setItems(data.checklistItems);
+        // Natural Sort (1, 2, 10 instead of 1, 10, 2)
+        const sortedItems = data.checklistItems.sort((a: ChecklistItem, b: ChecklistItem) => 
+            a.question.localeCompare(b.question, undefined, { numeric: true, sensitivity: 'base' })
+        );
+        setItems(sortedItems);
         setNotes(data.notes || "");
       }
     } catch (err) {
@@ -224,12 +228,12 @@ function MaintenanceProcessPageContent() {
             <div 
                 key={item.id} 
                 onClick={() => toggleItem(item.id)}
-                className={`p-4 flex items-center space-x-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!canEdit ? 'cursor-default' : ''}`}
+                className={`p-4 flex items-start space-x-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${!canEdit ? 'cursor-default' : ''}`}
             >
-                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${item.isChecked ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-600'}`}>
-                    {item.isChecked && <span className="text-white text-xs">✓</span>}
+                <div className={`w-6 h-6 flex-shrink-0 mt-0.5 rounded-full border-2 flex items-center justify-center transition-colors ${item.isChecked ? 'bg-green-500 border-green-500' : 'border-gray-300 dark:border-gray-600'}`}>
+                    {item.isChecked && <span className="text-white text-xs font-bold">✓</span>}
                 </div>
-                <span className={`text-sm ${item.isChecked ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}`}>{item.question}</span>
+                <span className={`text-sm leading-relaxed ${item.isChecked ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'}`}>{item.question}</span>
             </div>
         ))}
         {items.length === 0 && <div className="p-4 text-center text-gray-400">Liste boş.</div>}

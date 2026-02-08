@@ -22,9 +22,7 @@ export async function GET(
         branch: {
             select: { name: true, address: true }
         },
-        checklistItems: {
-            orderBy: { question: 'asc' }
-        },
+        checklistItems: true,
         photos: true,
         staff: {
             select: { fullName: true }

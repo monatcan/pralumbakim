@@ -8,7 +8,8 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        HOSTNAME: '127.0.0.1', // Force IPv4 to match IIS configuration
+        HOSTNAME: '127.0.0.1',
+        NEXTAUTH_URL: 'https://gemtech.net.tr', // Public URL
       },
     },
   ],

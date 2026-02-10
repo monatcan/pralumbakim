@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import 'dotenv/config' // Load .env
+import { prisma } from './lib/prisma'
 
 async function main() {
   try {
@@ -16,12 +15,10 @@ async function main() {
     const branchCount = await prisma.branch.count()
     console.log(`✅ Branch tablosu bulundu. Kayıt sayısı: ${branchCount}`)
 
-    console.log('\nSONUÇ: Tablolar veritabanında mevcut ve erişilebilir.')
+// SONUÇ satırının altındaki await prisma.$disconnect() kaldırıldı çünkü src/lib/prisma.ts yönetiyor
   } catch (e) {
     console.error('\nHATA: Tablolara erişilemedi.')
     console.error(e)
-  } finally {
-    await prisma.$disconnect()
   }
 }
 

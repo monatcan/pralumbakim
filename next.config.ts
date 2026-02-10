@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Canlı sunucuda build boyutunu küçültür ve deployment'ı kolaylaştırır
-  output: 'standalone',
+  // output: 'standalone', // Disabled to fix asset serving issues on Windows IIS
 
   // Devre dışı bırakılan geliştirici göstergeleri
   devIndicators: false,
